@@ -7,6 +7,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
 
@@ -22,7 +23,6 @@ public class JobController {
     // The detail display for a given Job at URLs like /job?id=17
     @RequestMapping(value = "", method = RequestMethod.GET)
     public String index(Model model, int id) {
-
         model.addAttribute("job", jobData.findById(id));
 
         // TODO #1 - get the Job with the given ID and pass it into the view
@@ -37,7 +37,7 @@ public class JobController {
     }
 
     @RequestMapping(value = "add", method = RequestMethod.POST)
-    public String add(Model model, @Valid JobForm jobForm, Errors errors) {
+    public String add(Model model, @Valid JobForm jobForm, Errors errors, RedirectAttributes ra) {
         if (errors.hasErrors()) {
             model.addAttribute("errors", errors);
             return "new-job";
@@ -53,14 +53,17 @@ public class JobController {
         Job newJob = new Job(jobForm.getName(), anEmployer, aLocation, aPositionType, aCoreCompetency) ;
 
         jobData.add(newJob);
-        model.addAttribute("job", newJob);
+        int id = newJob.getId();
+
 
 
         // TODO #6 - Validate the JobForm model, and if valid, create a
         // new Job and add it to the jobData data store. Then
         // redirect to the job detail view for the new Job.
 
-        return "job-detail";
+
+        ra.addAttribute("id", id);
+        return  "redirect:/job";
 
     }
 }
